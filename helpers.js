@@ -19,8 +19,3 @@ export function getIdsFromLink() {
 	const idsString = window.location.hash.substring(1);
 	return idsString ? idsString.split(',') : [];
 }
-
-export function updateLink() {
-	const idsString = favoriteIds.join(',');
-	window.location.hash = idsString;
-}

@@ -1,9 +1,4 @@
-import {
-	createElement,
-	clearElement,
-	getIdsFromLink,
-	updateLink,
-} from './helpers';
+import { createElement, clearElement, getIdsFromLink } from './helpers';
 import { movieGenres, OPERATIONS } from './constants';
 import { titleTexts } from './constants';
 
@@ -73,4 +68,9 @@ function updateStorage(operation, value) {
 		default:
 			break;
 	}
+}
+
+export function updateLink() {
+	const idsString = favoriteIds.join(',');
+	window.location.hash = idsString;
 }
