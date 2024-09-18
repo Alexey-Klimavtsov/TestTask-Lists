@@ -1,4 +1,9 @@
-import { createElement, clearElement } from './helpers';
+import {
+	createElement,
+	clearElement,
+	getIdsFromLink,
+	updateLink,
+} from './helpers';
 import { movieGenres, OPERATIONS } from './constants';
 import { titleTexts } from './constants';
 
@@ -20,10 +25,10 @@ function initApp(rootElem) {
 
 function renderList(titleText, list = [], rooListElem) {
 	clearElement(rooListElem);
-
 	const titleElem = createElement('h3');
 	titleElem.textContent = titleText;
 	rooListElem.append(titleElem);
+
 	if (list.length === 0) {
 		const textElem = createElement('p');
 		textElem.textContent = 'Ничего не выбрано';
@@ -32,7 +37,6 @@ function renderList(titleText, list = [], rooListElem) {
 	}
 
 	const listElem = createElement('ul', 'list');
-
 	const listItemElements = list.map((id) => {
 		const { genre } = movieGenres.find((item) => item.id == id);
 		const liElem = createElement('li', 'list__item');
@@ -42,6 +46,7 @@ function renderList(titleText, list = [], rooListElem) {
 		checkBoxElem.setAttribute('type', 'checkbox');
 		checkBoxElem.setAttribute('id', id);
 		const isChecked = favoriteIds.includes(id);
+		checkBoxElem.checked = isChecked;
 		checkBoxElem.addEventListener('change', (e) => {
 			const operation = e.target.checked ? OPERATIONS.add : OPERATIONS.remove;
 			updateStorage(operation, e.target.id);
@@ -49,8 +54,6 @@ function renderList(titleText, list = [], rooListElem) {
 			renderList(titleTexts.second, favoriteIds, favoriteLisElem);
 			renderList(titleTexts.base, movieGenresIds, baseListElem);
 		});
-		checkBoxElem.checked = favoriteIds.includes(id);
-
 		labelElem.prepend(checkBoxElem);
 		liElem.append(labelElem);
 		return liElem;
@@ -59,12 +62,6 @@ function renderList(titleText, list = [], rooListElem) {
 	listElem.append(...listItemElements);
 	rooListElem.append(listElem);
 }
-
-function getIdsFromLink() {
-	const idsString = window.location.hash.substring(1);
-	return idsString ? idsString.split(',') : [];
-}
-
 function updateStorage(operation, value) {
 	switch (operation) {
 		case OPERATIONS.add:
@@ -76,9 +73,4 @@ function updateStorage(operation, value) {
 		default:
 			break;
 	}
-}
-
-function updateLink() {
-	const idsString = favoriteIds.join(',');
-	window.location.hash = idsString;
 }
