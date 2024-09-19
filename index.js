@@ -1,4 +1,10 @@
-import { createElement, clearElement, getIdsFromLink } from './helpers';
+import {
+	createElement,
+	clearElement,
+	getIdsFromLink,
+	updateFavoriteIdsInURL,
+	updateFavoriteIds,
+} from './helpers';
 import { movieGenres, OPERATIONS } from './constants';
 import { titleTexts } from './constants';
 
@@ -32,45 +38,31 @@ function renderList(titleText, list = [], rooListElem) {
 	}
 
 	const listElem = createElement('ul', 'list');
-	const listItemElements = list.map((id) => {
+	const listElements = list.map((id) => {
+		const templateElem = document.getElementById('li');
+		const templateContent = templateElem.content.cloneNode(true);
+		const liElem = templateContent.querySelector('.list__item');
+		const labelElem = templateContent.querySelector('label');
+		const checkBoxElem = templateContent.querySelector('input');
 		const { genre } = movieGenres.find((item) => item.id == id);
-		const liElem = createElement('li', 'list__item');
-		const labelElem = createElement('label', 'label');
 		labelElem.textContent = genre;
-		const checkBoxElem = createElement('input');
-		checkBoxElem.setAttribute('type', 'checkbox');
+		labelElem.setAttribute('for', id);
 		checkBoxElem.setAttribute('id', id);
 		const isChecked = favoriteIds.includes(id);
 		checkBoxElem.checked = isChecked;
-		checkBoxElem.addEventListener('change', (e) => {
-			const operation = e.target.checked ? OPERATIONS.add : OPERATIONS.remove;
-			updateStorage(operation, e.target.id);
-			updateLink();
-			renderList(titleTexts.second, favoriteIds, favoriteLisElem);
-			renderList(titleTexts.base, movieGenresIds, baseListElem);
-		});
-		labelElem.prepend(checkBoxElem);
-		liElem.append(labelElem);
+		checkBoxElem.addEventListener('change', handleCheckBoxClick);
 		return liElem;
 	});
 
-	listElem.append(...listItemElements);
+	listElem.append(...listElements);
 	rooListElem.append(listElem);
 }
-function updateStorage(operation, value) {
-	switch (operation) {
-		case OPERATIONS.add:
-			favoriteIds.push(value);
-			break;
-		case OPERATIONS.remove:
-			favoriteIds = favoriteIds.filter((id) => id !== value);
-			break;
-		default:
-			break;
-	}
-}
 
-export function updateLink() {
-	const idsString = favoriteIds.join(',');
-	window.location.hash = idsString;
+function handleCheckBoxClick(e) {
+	const isChecked = e.target.checked;
+	const operation = isChecked ? OPERATIONS.add : OPERATIONS.remove;
+	favoriteIds = updateFavoriteIds(operation, e.target.id, favoriteIds);
+	updateFavoriteIdsInURL(favoriteIds);
+	renderList(titleTexts.second, favoriteIds, favoriteLisElem);
+	renderList(titleTexts.base, movieGenresIds, baseListElem);
 }
