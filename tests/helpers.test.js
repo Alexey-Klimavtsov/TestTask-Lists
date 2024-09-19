@@ -4,7 +4,7 @@ import {
 	getIdsFromLink,
 	updateFavoriteIds,
 	updateFavoriteIdsInURL,
-} from '../helpers';
+} from '../src/helpers';
 
 beforeEach(() => {
 	delete window.location;
